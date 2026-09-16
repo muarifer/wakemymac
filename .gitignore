@@ -1,0 +1,5 @@
+.build/
+.swiftpm/
+WakeMyMac.app/
+*.zip
+.DS_Store
