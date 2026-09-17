@@ -50,15 +50,39 @@ struct MenuView: View {
             }
 
             Divider()
-            daemonSection
-            Divider()
+            // When the helper is running the header's green dot says so, and
+            // this row would be redundant.
+            if !state.daemonReachable {
+                daemonSection
+                Divider()
+            }
+            // Kept outside daemonSection: failures happen while the helper is
+            // running too, and they must stay visible when that row is hidden.
+            if let error = state.lastError {
+                Text(error)
+                    .font(.caption2).foregroundStyle(.red)
+                    .lineLimit(3)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                Divider()
+            }
             footer
         }
     }
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("WakeMyMac").font(.headline)
+            HStack(spacing: 6) {
+                if state.daemonReachable {
+                    Circle()
+                        .fill(Color.green)
+                        .frame(width: 8, height: 8)
+                        .help(L10n.helper(L10n.statusRunning))
+                        .accessibilityLabel(L10n.helper(L10n.statusRunning))
+                }
+                Text("WakeMyMac").font(.headline)
+            }
             if let next = state.nextEvent {
                 TimelineView(.periodic(from: .now, by: 1)) { _ in
                     Label {
@@ -109,24 +133,19 @@ struct MenuView: View {
         }
     }
 
+    /// Shown only while the helper is unreachable: what is wrong, plus the way
+    /// out of it.
     private var daemonSection: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Circle()
-                    .fill(state.daemonReachable ? Color.green : Color.orange)
-                    .frame(width: 8, height: 8)
-                Text(L10n.helper(state.daemonStatusDescription))
-                    .font(.caption)
-                Spacer()
-                if state.daemonStatus != .enabled {
-                    Button(L10n.install) { Task { await state.installDaemon() } }
-                        .controlSize(.small)
-                }
-            }
-            if let error = state.lastError {
-                Text(error)
-                    .font(.caption2).foregroundStyle(.red)
-                    .lineLimit(2)
+        HStack {
+            Circle()
+                .fill(Color.orange)
+                .frame(width: 8, height: 8)
+            Text(L10n.helper(state.daemonStatusDescription))
+                .font(.caption)
+            Spacer()
+            if state.daemonStatus != .enabled {
+                Button(L10n.install) { Task { await state.installDaemon() } }
+                    .controlSize(.small)
             }
         }
         .padding(10)
