@@ -6,142 +6,16 @@
 <title>WakeMyMac — scheduled power events for macOS</title>
 <meta name="description" content="A macOS menu bar app that wakes, sleeps or shuts down your Mac on schedule. Unlimited recurring rules, unlike pmset repeat.">
 <link rel="icon" href="icon.png">
+<link rel="canonical" href="https://muarifer.github.io/wakemymac/">
+<link rel="alternate" hreflang="en" href="https://muarifer.github.io/wakemymac/">
+<link rel="alternate" hreflang="tr" href="https://muarifer.github.io/wakemymac/index-tr.html">
 <meta property="og:title" content="WakeMyMac">
 <meta property="og:description" content="Wake, sleep or shut down your Mac on schedule — from the menu bar.">
 <meta property="og:image" content="https://muarifer.github.io/wakemymac/icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #e9eaec;
-    --card: #f7f7f8;
-    --fg: #14151a;
-    --fg-2: rgba(15, 19, 36, 0.64);
-    --fg-3: rgba(13, 17, 38, 0.46);
-    --line: #d7d9de;
-    --accent: #b75f35;
-    --accent-surface: rgba(183, 95, 53, 0.075);
-    --accent-border: rgba(183, 95, 53, 0.24);
-    --radius: 6px;
-    --sans: "Host Grotesk", ui-sans-serif, system-ui, sans-serif;
-    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #131418;
-      --card: #1b1c21;
-      --fg: #f2f3f5;
-      --fg-2: rgba(242, 243, 245, 0.62);
-      --fg-3: rgba(242, 243, 245, 0.42);
-      --line: #2b2d34;
-      --accent: #e0834f;
-      --accent-surface: rgba(224, 131, 79, 0.1);
-      --accent-border: rgba(224, 131, 79, 0.28);
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #131418;
-    --card: #1b1c21;
-    --fg: #f2f3f5;
-    --fg-2: rgba(242, 243, 245, 0.62);
-    --fg-3: rgba(242, 243, 245, 0.42);
-    --line: #2b2d34;
-    --accent: #e0834f;
-    --accent-surface: rgba(224, 131, 79, 0.1);
-    --accent-border: rgba(224, 131, 79, 0.28);
-  }
-
-  * { box-sizing: border-box; }
-  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-  body {
-    margin: 0;
-    background: var(--bg);
-    color: var(--fg);
-    font-family: var(--sans);
-    font-size: 16px;
-    line-height: 1.6;
-  }
-  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
-
-  /* Header */
-  header { padding: 56px 0 8px; }
-  .top { display: flex; align-items: center; gap: 14px; }
-  .top img { width: 56px; height: 56px; }
-  h1 { font-size: 30px; font-weight: 600; margin: 0; letter-spacing: -0.02em; }
-  .tagline { color: var(--fg-2); margin: 14px 0 0; font-size: 18px; }
-  .lang {
-    margin-left: auto; display: flex; gap: 2px;
-    border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--card);
-  }
-  .lang button {
-    font: 500 12px/1 var(--mono); color: var(--fg-2);
-    background: none; border: 0; border-radius: 999px;
-    padding: 6px 10px; cursor: pointer;
-  }
-  .lang button[aria-pressed="true"] { background: var(--accent); color: #fff; }
-
-  /* Blocks */
-  section { padding: 34px 0; border-top: 1px solid var(--line); margin-top: 34px; }
-  header + section { border-top: 0; margin-top: 0; }
-  h2 {
-    font: 500 12px/1 var(--mono); text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--fg-3); margin: 0 0 18px;
-  }
-  p { margin: 0 0 14px; color: var(--fg-2); }
-  p.lead { color: var(--fg); }
-  strong { color: var(--fg); font-weight: 500; }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-
-  .badge {
-    display: inline-block; font: 500 11px/1 var(--mono);
-    color: var(--accent); background: var(--accent-surface);
-    border: 1px solid var(--accent-border); border-radius: 999px;
-    padding: 5px 10px; margin-bottom: 18px;
-  }
-
-  .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 6px; }
-  .btn {
-    display: inline-block; background: var(--accent); color: #fff;
-    border-radius: var(--radius); padding: 10px 18px; font-weight: 500; font-size: 15px;
-  }
-  .btn:hover { text-decoration: none; opacity: 0.9; }
-  .btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
-
-  pre, code { font-family: var(--mono); font-size: 13px; }
-  pre {
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 14px 16px; overflow-x: auto; margin: 0 0 14px; color: var(--fg);
-  }
-  p > code {
-    background: var(--card); border: 1px solid var(--line);
-    border-radius: 4px; padding: 1px 5px; color: var(--fg);
-  }
-
-  .shots { display: flex; flex-wrap: wrap; gap: 16px; }
-  .shots img {
-    flex: 1 1 300px; min-width: 0; max-width: 100%;
-    border: 1px solid var(--line); border-radius: var(--radius); background: var(--card);
-  }
-
-  ul { margin: 0; padding-left: 0; list-style: none; }
-  li { color: var(--fg-2); padding: 9px 0; border-bottom: 1px solid var(--line); }
-  li:last-child { border-bottom: 0; }
-
-  .note {
-    background: var(--accent-surface); border: 1px solid var(--accent-border);
-    border-radius: var(--radius); padding: 14px 16px; color: var(--fg-2); font-size: 15px;
-  }
-
-  footer {
-    border-top: 1px solid var(--line); margin-top: 34px;
-    padding: 24px 0 56px; color: var(--fg-3); font-size: 14px;
-  }
-  footer a { color: var(--fg-2); }
-
-  [lang-hide] { display: none !important; }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="wrap">
@@ -150,116 +24,76 @@
     <div class="top">
       <img src="icon.png" alt="WakeMyMac icon">
       <h1>WakeMyMac</h1>
-      <div class="lang">
-        <button type="button" data-lang="en" aria-pressed="true">EN</button>
-        <button type="button" data-lang="tr" aria-pressed="false">TR</button>
-      </div>
+      <nav class="lang">
+        <a href="index.html" aria-current="page">EN</a>
+        <a href="index-tr.html" hreflang="tr">TR</a>
+      </nav>
     </div>
-    <p class="tagline" data-en="Wake, sleep or shut down your Mac on schedule — from the menu bar."
-       data-tr="Mac'inizi programa göre uyandırın, uyutun veya kapatın — menü barından."></p>
+    <p class="tagline">Wake, sleep or shut down your Mac on schedule — from the menu bar.</p>
   </header>
 
   <section>
-    <span class="badge" data-en="macOS 13+ · Intel &amp; Apple Silicon" data-tr="macOS 13+ · Intel ve Apple Silicon"></span>
-    <p class="lead"
-       data-en="macOS used to have a schedule panel in Energy Saver. Apple removed it, and the replacement is a Terminal command whose repeat mode allows exactly one recurring event. WakeMyMac brings the panel back — with as many rules as you want."
-       data-tr="macOS'ta Enerji Tasarrufu altında bir zamanlama paneli vardı. Apple onu kaldırdı; yerine önerilen Terminal komutunun tekrar kipi ise yalnızca tek bir tekrarlı olaya izin veriyor. WakeMyMac o paneli geri getiriyor — istediğiniz kadar kuralla."></p>
+    <span class="badge">macOS 13+ · Intel &amp; Apple Silicon</span>
+    <p class="lead">macOS used to have a schedule panel in Energy Saver. Apple removed it, and the replacement is a Terminal command whose repeat mode allows exactly one recurring event. WakeMyMac brings the panel back — with as many rules as you want.</p>
     <div class="actions">
-      <a class="btn" href="https://github.com/muarifer/wakemymac/releases/latest"
-         data-en="Download" data-tr="İndir"></a>
+      <a class="btn" href="https://github.com/muarifer/wakemymac/releases/latest">Download</a>
       <a class="btn ghost" href="https://github.com/muarifer/wakemymac">GitHub</a>
     </div>
   </section>
 
   <section>
-    <h2 data-en="Screenshots" data-tr="Ekran görüntüleri"></h2>
+    <h2>Screenshots</h2>
     <div class="shots">
-      <img src="screenshot.png" data-en-alt="The menu bar panel listing a rule with a live countdown to the next event"
-           data-tr-alt="Menü bar paneli: kural listesi ve sonraki olaya canlı geri sayım" alt="">
-      <img src="screenshot-editor.png" data-en-alt="Rule editor with action, time and day pickers"
-           data-tr-alt="Kural editörü: eylem, saat ve gün seçicileri" alt="">
+      <figure>
+        <img src="screenshot.png" alt="The menu bar panel listing a rule, with a live countdown to the next scheduled event">
+        <figcaption>Your rules and a live countdown to the next event.</figcaption>
+      </figure>
+      <figure>
+        <img src="screenshot-editor.png" alt="Rule editor set to Repeats, with checkboxes for each day of the week">
+        <figcaption>A repeating rule on any days of the week.</figcaption>
+      </figure>
+      <figure>
+        <img src="screenshot-once.png" alt="Rule editor set to Once, with a calendar picker open on a single date">
+        <figcaption>Or a one-time rule on a single date.</figcaption>
+      </figure>
     </div>
   </section>
 
   <section>
-    <h2 data-en="Install" data-tr="Kurulum"></h2>
-    <pre>brew tap muarifer/tap
-brew install --cask wakemymac</pre>
-    <p data-en="Releases are signed with a Developer ID certificate and notarized by Apple, so Gatekeeper opens them without extra steps. You can also download the app directly or build it from source."
-       data-tr="Sürümler Developer ID sertifikasıyla imzalanır ve Apple tarafından notarize edilir; Gatekeeper ek bir adım istemez. Uygulamayı doğrudan indirebilir ya da kaynaktan derleyebilirsiniz."></p>
-    <p data-en="After launching, click Install in the panel and approve the helper in System Settings → General → Login Items. The helper needs root because scheduling a wake or power-on event does."
-       data-tr="Açtıktan sonra panelden Install'a tıklayın ve yardımcıyı Sistem Ayarları → Genel → Giriş Öğeleri'nde onaylayın. Yardımcı root ister, çünkü uyandırma ve açma olayı zamanlamak root gerektirir."></p>
+    <h2>Install</h2>
+    <pre>brew tap muarifer/tap &amp;&amp; brew install --cask wakemymac</pre>
+    <p>After launching, click Install in the panel and approve the helper in System Settings → General → Login Items. The helper needs root because scheduling a wake or power-on event does.</p>
   </section>
 
   <section>
-    <h2 data-en="What it does" data-tr="Neler yapar"></h2>
+    <h2>What it does</h2>
     <ul>
-      <li data-en="Unlimited rules: wake, power on, sleep, shut down or restart"
-          data-tr="Sınırsız kural: uyandır, aç, uyut, kapat veya yeniden başlat"></li>
-      <li data-en="Repeating rules on any days of the week, or one-time rules on a single date"
-          data-tr="Haftanın istediğiniz günlerinde tekrarlı kurallar ya da tek bir tarihe tek seferlik kurallar"></li>
-      <li data-en="Live countdown to the next scheduled event"
-          data-tr="Sonraki olaya canlı geri sayım"></li>
-      <li data-en="Keeps working when nobody is logged in — the schedule survives reboots"
-          data-tr="Kimse oturum açmamışken de çalışır — zamanlama yeniden başlatmalara dayanır"></li>
-      <li data-en="Touches only the events it scheduled itself, so other tools keep working"
-          data-tr="Yalnızca kendi kurduğu olaylara dokunur, diğer araçlar çalışmaya devam eder"></li>
+      <li>Unlimited rules: wake, power on, sleep, shut down or restart</li>
+      <li>Repeating rules on any days of the week, or one-time rules on a single date</li>
+      <li>Live countdown to the next scheduled event</li>
+      <li>Keeps working when nobody is logged in — the schedule survives reboots</li>
+      <li>Touches only the events it scheduled itself, so other tools keep working</li>
     </ul>
   </section>
 
   <section>
-    <h2 data-en="How it works" data-tr="Nasıl çalışır"></h2>
-    <p data-en="The only real API for scheduled power events on macOS is IOPMSchedulePowerEvent, the same one pmset uses. It accepts any number of one-shot events but knows nothing about recurrence."
-       data-tr="macOS'ta zamanlanmış güç olayları için tek gerçek API, pmset'in de kullandığı IOPMSchedulePowerEvent. İstediğiniz kadar tek seferlik olay kabul eder ama tekrardan haberi yoktur."></p>
-    <p data-en="So recurrence lives in a small root daemon: it works out each rule's next occurrence, registers it as a one-shot event, and arms the following one after each event fires. You can see them yourself with"
-       data-tr="Tekrar bu yüzden küçük bir root daemon'da yaşıyor: her kuralın bir sonraki gerçekleşmesini hesaplar, tek seferlik olay olarak kaydeder ve olay geçtikçe sıradakini kurar. Kendiniz de görebilirsiniz:"></p>
+    <h2>How it works</h2>
+    <p>The only real API for scheduled power events on macOS is <code>IOPMSchedulePowerEvent</code>, the same one <code>pmset</code> uses. It accepts any number of one-shot events but knows nothing about recurrence.</p>
+    <p>So recurrence lives in a small root daemon: it works out each rule's next occurrence, registers it as a one-shot event, and arms the following one after each event fires. You can see them yourself with:</p>
     <pre>pmset -g sched</pre>
   </section>
 
   <section>
-    <h2 data-en="Good to know" data-tr="Bilinmesi gerekenler"></h2>
-    <div class="note"
-         data-en="WakeMyMac can shut down and restart your Mac unattended. macOS defers a shutdown when an app has unsaved work, but treat a scheduled shutdown as a real one and save your work. Powering on a closed laptop reliably needs the power adapter."
-         data-tr="WakeMyMac Mac'inizi siz başında değilken kapatabilir ve yeniden başlatabilir. macOS, kaydedilmemiş işi olan bir uygulama varsa kapatmayı erteler; yine de zamanlanmış kapatmayı gerçek bir kapatma gibi görün ve işinizi kaydedin. Kapalı bir dizüstünün güvenilir şekilde açılması için adaptöre bağlı olması gerekir."></div>
+    <h2>Good to know</h2>
+    <p class="note">WakeMyMac can shut down and restart your Mac unattended. macOS defers a shutdown when an app has unsaved work, but treat a scheduled shutdown as a real one and save your work. Powering on a closed laptop reliably needs the power adapter.</p>
   </section>
 
   <footer>
-    <p data-en="Free software under the GNU General Public License v3.0 or later. Source on GitHub."
-       data-tr="GNU Genel Kamu Lisansı v3.0 veya sonrası altında özgür yazılım. Kaynak kod GitHub'da."></p>
+    <p>Free software under the GNU General Public License v3.0 or later. Source on GitHub.</p>
     <p>© 2026 Murat Çeliker · <a href="https://github.com/muarifer/wakemymac">github.com/muarifer/wakemymac</a></p>
   </footer>
 
 </div>
-
-<script>
-  (function () {
-    var buttons = document.querySelectorAll('.lang button');
-
-    function apply(lang) {
-      document.documentElement.lang = lang;
-      document.querySelectorAll('[data-en]').forEach(function (el) {
-        var text = el.getAttribute('data-' + lang);
-        if (text) { el.textContent = text; }
-      });
-      document.querySelectorAll('[data-en-alt]').forEach(function (el) {
-        var alt = el.getAttribute('data-' + lang + '-alt');
-        if (alt) { el.alt = alt; }
-      });
-      buttons.forEach(function (b) {
-        b.setAttribute('aria-pressed', String(b.dataset.lang === lang));
-      });
-      try { localStorage.setItem('wmm-lang', lang); } catch (e) {}
-    }
-
-    var saved = null;
-    try { saved = localStorage.getItem('wmm-lang'); } catch (e) {}
-    var initial = saved || ((navigator.language || 'en').slice(0, 2) === 'tr' ? 'tr' : 'en');
-
-    buttons.forEach(function (b) {
-      b.addEventListener('click', function () { apply(b.dataset.lang); });
-    });
-    apply(initial);
-  })();
-</script>
+<script src="copy.js"></script>
 </body>
 </html>

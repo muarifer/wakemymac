@@ -76,6 +76,7 @@ enum L10n {
     static var onceMode: String { t("Once", "Tek seferlik") }
     static var date: String { t("Date", "Tarih") }
     static var expired: String { t("Expired", "Süresi geçti") }
+    static var noDays: String { t("No days selected", "Gün seçilmedi") }
 
     static func name(of action: PowerAction) -> String {
         switch action {
@@ -109,6 +110,9 @@ enum L10n {
 
         case .weekly(let weekdays):
             let days = Set(weekdays)
+            // A rule can only reach this state through a corrupt or
+            // foreign-format rules.json; saying so beats rendering a bare "· 08:00".
+            if days.isEmpty { return noDays }
             if days == Set(1...7) { return everyDay }
             if days == Set(2...6) { return self.weekdays }
             if days == Set([1, 7]) { return weekends }

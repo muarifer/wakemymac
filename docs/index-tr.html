@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WakeMyMac — macOS için zamanlanmış güç olayları</title>
+<meta name="description" content="Mac'inizi programa göre uyandıran, uyutan veya kapatan bir menü bar uygulaması. pmset repeat'in aksine sınırsız tekrarlı kural.">
+<link rel="icon" href="icon.png">
+<link rel="canonical" href="https://muarifer.github.io/wakemymac/index-tr.html">
+<link rel="alternate" hreflang="en" href="https://muarifer.github.io/wakemymac/">
+<link rel="alternate" hreflang="tr" href="https://muarifer.github.io/wakemymac/index-tr.html">
+<meta property="og:title" content="WakeMyMac">
+<meta property="og:description" content="Mac'inizi programa göre uyandırın, uyutun veya kapatın — menü barından.">
+<meta property="og:image" content="https://muarifer.github.io/wakemymac/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="top">
+      <img src="icon.png" alt="WakeMyMac simgesi">
+      <h1>WakeMyMac</h1>
+      <nav class="lang">
+        <a href="index.html" hreflang="en">EN</a>
+        <a href="index-tr.html" aria-current="page">TR</a>
+      </nav>
+    </div>
+    <p class="tagline">Mac'inizi programa göre uyandırın, uyutun veya kapatın — menü barından.</p>
+  </header>
+
+  <section>
+    <span class="badge">macOS 13+ · Intel ve Apple Silicon</span>
+    <p class="lead">macOS'ta Enerji Tasarrufu altında bir zamanlama paneli vardı. Apple onu kaldırdı; yerine önerdiği Terminal komutunun tekrar kipi ise yalnızca tek bir tekrarlı olaya izin veriyor. WakeMyMac o paneli geri getiriyor — istediğiniz kadar kuralla.</p>
+    <div class="actions">
+      <a class="btn" href="https://github.com/muarifer/wakemymac/releases/latest">İndir</a>
+      <a class="btn ghost" href="https://github.com/muarifer/wakemymac">GitHub</a>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ekran görüntüleri</h2>
+    <div class="shots">
+      <figure>
+        <img src="screenshot.png" alt="Menü bar paneli: kural listesi ve sonraki olaya canlı geri sayım">
+        <figcaption>Kurallarınız ve sonraki olaya canlı geri sayım.</figcaption>
+      </figure>
+      <figure>
+        <img src="screenshot-editor.png" alt="Kural editörü Tekrarlı kipinde, haftanın her günü için onay kutuları">
+        <figcaption>Haftanın istediğiniz günlerinde tekrarlı kural.</figcaption>
+      </figure>
+      <figure>
+        <img src="screenshot-once.png" alt="Kural editörü Tek seferlik kipinde, açılmış takvim seçici">
+        <figcaption>Ya da tek bir tarihe tek seferlik kural.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>Kurulum</h2>
+    <pre>brew tap muarifer/tap &amp;&amp; brew install --cask wakemymac</pre>
+    <p>Açtıktan sonra panelden Install'a tıklayın ve yardımcıyı Sistem Ayarları → Genel → Giriş Öğeleri'nde onaylayın. Yardımcı root ister, çünkü uyandırma ve açma olayı zamanlamak root gerektirir.</p>
+  </section>
+
+  <section>
+    <h2>Neler yapar</h2>
+    <ul>
+      <li>Sınırsız kural: uyandır, aç, uyut, kapat veya yeniden başlat</li>
+      <li>Haftanın istediğiniz günlerinde tekrarlı kurallar ya da tek bir tarihe tek seferlik kurallar</li>
+      <li>Sonraki olaya canlı geri sayım</li>
+      <li>Kimse oturum açmamışken de çalışır — zamanlama yeniden başlatmalara dayanır</li>
+      <li>Yalnızca kendi kurduğu olaylara dokunur, diğer araçlar çalışmaya devam eder</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Nasıl çalışır</h2>
+    <p>macOS'ta zamanlanmış güç olayları için tek gerçek API, <code>pmset</code>'in de kullandığı <code>IOPMSchedulePowerEvent</code>. İstediğiniz kadar tek seferlik olay kabul eder ama tekrardan haberi yoktur.</p>
+    <p>Tekrar bu yüzden küçük bir root daemon'da yaşıyor: her kuralın bir sonraki gerçekleşmesini hesaplar, tek seferlik olay olarak kaydeder ve olay geçtikçe sıradakini kurar. Kendiniz de görebilirsiniz:</p>
+    <pre>pmset -g sched</pre>
+  </section>
+
+  <section>
+    <h2>Bilinmesi gerekenler</h2>
+    <p class="note">WakeMyMac Mac'inizi siz başında değilken kapatabilir ve yeniden başlatabilir. macOS, kaydedilmemiş işi olan bir uygulama varsa kapatmayı erteler; yine de zamanlanmış kapatmayı gerçek bir kapatma gibi görün ve işinizi kaydedin. Kapalı bir dizüstünün güvenilir şekilde açılması için adaptöre bağlı olması gerekir.</p>
+  </section>
+
+  <footer>
+    <p>GNU Genel Kamu Lisansı v3.0 veya sonrası altında özgür yazılım. Kaynak kod GitHub'da.</p>
+    <p>© 2026 Murat Çeliker · <a href="https://github.com/muarifer/wakemymac">github.com/muarifer/wakemymac</a></p>
+  </footer>
+
+</div>
+<script src="copy.js"></script>
+</body>
+</html>
