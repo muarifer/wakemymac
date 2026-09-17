@@ -37,7 +37,10 @@ sed -i '' \
     -e "s/^  version .*/  version \"${VERSION}\"/" \
     -e "s/^  sha256 .*/  sha256 \"${SHA}\"/" \
     "$CASK"
-# Yalnızca cask dosyasını commit'le — tap reposundaki ilgisiz değişikliklere dokunma
+# Yalnızca cask dosyasını ekle ve commit'le — tap reposundaki ilgisiz
+# değişikliklere dokunma. `add` ilk release için gerekli: o ana kadar cask
+# tap'te takipsiz durur ve pathspec'li commit onu bulamaz.
+git -C "$TAP_DIR" add Casks/wakemymac.rb
 git -C "$TAP_DIR" commit -m "wakemymac ${VERSION}" -- Casks/wakemymac.rb
 git -C "$TAP_DIR" push
 
