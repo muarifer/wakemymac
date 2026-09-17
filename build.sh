@@ -6,11 +6,21 @@
 set -e
 cd "$(dirname "$0")"
 
-VERSION="${VERSION:-0.1.0}"
+VERSION="${VERSION:-1.0.0}"
 MODE="${1:-}"
 
 BUNDLE_ID="com.muarifer.wakemymac"
 DAEMON_LABEL="com.muarifer.wakemymac.daemon"
+
+# Sürüm iki yerde yaşıyor: burada (Info.plist'e gider) ve kaynakta (daemon'ın
+# XPC üzerinden bildirdiği sürüm). Ayrışırlarsa release sessizce yanlış sürüm
+# taşır, o yüzden baştan dur.
+SRC_VERSION=$(grep -o 'let version = "[^"]*"' Sources/WakeCore/DaemonConstants.swift | cut -d'"' -f2)
+if [[ "$SRC_VERSION" != "$VERSION" ]]; then
+    echo "ERROR: version mismatch — build.sh says ${VERSION}, DaemonConstants.swift says ${SRC_VERSION}." >&2
+    echo "Update Sources/WakeCore/DaemonConstants.swift to match." >&2
+    exit 1
+fi
 
 if [[ "$MODE" == "--universal" || "$MODE" == "--release" ]]; then
     swift build -c release --arch arm64 --arch x86_64

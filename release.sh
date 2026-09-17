@@ -1,7 +1,7 @@
 #!/bin/zsh
 # Full release: universal build, Developer ID signing, notarization,
 # GitHub release, and Homebrew cask update.
-#   ./release.sh 0.1.0
+#   ./release.sh 1.0.0
 set -e
 cd "$(dirname "$0")"
 

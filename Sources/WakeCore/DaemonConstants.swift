@@ -18,7 +18,7 @@ public enum DaemonConstants {
     public static let rulesDirectory = "/Library/Application Support/WakeMyMac"
     public static let rulesFileName = "rules.json"
 
-    public static let version = "0.1.0"
+    public static let version = "1.0.0"
 }
 
 /// Bounds enforced on anything crossing XPC or coming off disk. Each rule turns
