@@ -9,12 +9,16 @@ struct RuleEditorView: View {
     @State private var time: Date
     let isNew: Bool
     let onSave: (Rule) -> Void
+    let onDelete: () -> Void
     let onCancel: () -> Void
 
     init(rule: Rule, isNew: Bool = false,
-         onSave: @escaping (Rule) -> Void, onCancel: @escaping () -> Void) {
+         onSave: @escaping (Rule) -> Void,
+         onDelete: @escaping () -> Void,
+         onCancel: @escaping () -> Void) {
         _rule = State(initialValue: rule)
         self.isNew = isNew
+        self.onDelete = onDelete
         var components = DateComponents()
         components.hour = rule.hour
         components.minute = rule.minute
@@ -44,6 +48,9 @@ struct RuleEditorView: View {
 
             HStack {
                 Button(L10n.cancel, role: .cancel, action: onCancel)
+                if !isNew {
+                    Button(L10n.delete, role: .destructive, action: onDelete)
+                }
                 Spacer()
                 Button(L10n.save) {
                     let components = Calendar.current.dateComponents([.hour, .minute], from: time)

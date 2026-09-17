@@ -7,6 +7,7 @@ import WakeCore
 struct MenuView: View {
     @EnvironmentObject private var state: AppState
     @State private var editingRule: Rule?
+    @State private var hoveredRuleID: UUID?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -17,6 +18,10 @@ struct MenuView: View {
                     onSave: { saved in
                         editingRule = nil
                         Task { await state.upsertRule(saved) }
+                    },
+                    onDelete: {
+                        editingRule = nil
+                        Task { await state.deleteRule(rule) }
                     },
                     onCancel: { editingRule = nil }
                 )
@@ -113,6 +118,20 @@ struct MenuView: View {
                     .font(.caption).foregroundStyle(.secondary)
             }
             Spacer()
+            // Revealed on hover rather than inserted, so the switch below does
+            // not shift sideways as the pointer moves down the list.
+            Button {
+                Task { await state.deleteRule(rule) }
+            } label: {
+                Image(systemName: "trash")
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
+            .help(L10n.delete)
+            .accessibilityLabel(L10n.delete)
+            .opacity(hoveredRuleID == rule.id ? 1 : 0)
+            .disabled(hoveredRuleID != rule.id)
+
             Toggle("", isOn: Binding(
                 get: { rule.enabled },
                 set: { _ in Task { await state.toggleRule(rule) } }
@@ -124,6 +143,7 @@ struct MenuView: View {
         .padding(.vertical, 4)
         .padding(.horizontal, 6)
         .contentShape(Rectangle())
+        .onHover { hoveredRuleID = $0 ? rule.id : nil }
         .onTapGesture { editingRule = rule }
         .contextMenu {
             Button(L10n.edit) { editingRule = rule }
