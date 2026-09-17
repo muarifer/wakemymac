@@ -72,7 +72,7 @@ final class SchedulerEngine {
                 log.error("Could not delete rules file: \(error.localizedDescription)")
                 return "Scheduled events were cancelled, but the rules file could not be removed: \(error.localizedDescription)"
             }
-            log.info("Prepared for removal: events cancelled and rules deleted")
+            log.notice("Prepared for removal: events cancelled and rules deleted")
             return nil
         }
     }
@@ -88,7 +88,7 @@ final class SchedulerEngine {
         for index in rules.indices where rules[index].enabled && rules[index].isExpired() {
             rules[index].enabled = false
             changed = true
-            log.info("Retired spent one-time rule \(rules[index].effectiveLabel, privacy: .public)")
+            log.notice("Retired spent one-time rule \(rules[index].effectiveLabel, privacy: .public)")
         }
         if changed {
             do {
@@ -117,7 +117,7 @@ final class SchedulerEngine {
                 scheduled.append(ScheduledEventInfo(
                     date: next, action: rule.action,
                     ruleID: rule.id, ruleLabel: rule.effectiveLabel))
-                log.info("Scheduled \(rule.action.rawValue) at \(next, privacy: .public) for rule \(rule.effectiveLabel, privacy: .public)")
+                log.notice("Scheduled \(rule.action.rawValue) at \(next, privacy: .public) for rule \(rule.effectiveLabel, privacy: .public)")
             } catch {
                 log.error("Could not schedule \(rule.action.rawValue) at \(next): \(String(describing: error))")
             }
@@ -148,7 +148,7 @@ final class SchedulerEngine {
         let t = DispatchSource.makeTimerSource(queue: queue)
         t.schedule(wallDeadline: .now() + delay)
         t.setEventHandler { [weak self] in
-            self?.log.info("Re-arm timer fired, rescheduling")
+            self?.log.notice("Re-arm timer fired, rescheduling")
             self?.reschedule()
         }
         t.resume()

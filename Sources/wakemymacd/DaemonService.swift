@@ -44,7 +44,7 @@ final class DaemonService: NSObject, WakeDaemonProtocol {
         // so the reply above is actually delivered.
         DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
             Logger(subsystem: DaemonConstants.machServiceName, category: "xpc")
-                .info("Exiting after removal request")
+                .notice("Exiting after removal request")
             exit(0)
         }
     }
@@ -79,7 +79,7 @@ final class XPCListenerDelegate: NSObject, NSXPCListenerDelegate {
         newConnection.exportedInterface = NSXPCInterface(with: WakeDaemonProtocol.self)
         newConnection.exportedObject = DaemonService(engine: engine)
         newConnection.resume()
-        log.info("Accepted XPC connection from pid \(newConnection.processIdentifier)")
+        log.notice("Accepted XPC connection from pid \(newConnection.processIdentifier)")
         return true
     }
 }
