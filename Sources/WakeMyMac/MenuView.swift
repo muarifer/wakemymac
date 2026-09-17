@@ -138,6 +138,9 @@ struct MenuView: View {
             }
             Spacer()
             Menu {
+                Text("WakeMyMac \(AppInfo.version)")
+                Button(L10n.about) { AppInfo.showAbout() }
+                Divider()
                 Toggle(L10n.launchAtLogin, isOn: Binding(
                     get: { state.launchAtLogin },
                     set: { state.setLaunchAtLogin($0) }

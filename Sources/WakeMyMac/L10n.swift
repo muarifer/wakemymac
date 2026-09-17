@@ -21,6 +21,11 @@ enum L10n {
     static var launchAtLogin: String { t("Launch at Login", "Girişte Başlat") }
     static var uninstallHelper: String { t("Uninstall Helper…", "Yardımcıyı Kaldır…") }
     static var quit: String { t("Quit WakeMyMac", "WakeMyMac'ten Çık") }
+    static var about: String { t("About WakeMyMac", "WakeMyMac Hakkında") }
+    static var aboutCredits: String {
+        t("Wakes, sleeps or shuts down your Mac on schedule.",
+          "Mac'inizi zamanlanmış kurallarla uyandırır, uyutur veya kapatır.")
+    }
 
     // Helper (daemon) status
     static func helper(_ status: String) -> String { t("Helper: \(status)", "Yardımcı: \(status)") }

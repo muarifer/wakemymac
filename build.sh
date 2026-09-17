@@ -22,10 +22,15 @@ fi
 
 APP="WakeMyMac.app"
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Library/LaunchDaemons"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Library/LaunchDaemons"
 
 cp "$BIN_DIR/WakeMyMac" "$APP/Contents/MacOS/WakeMyMac"
 cp "$BIN_DIR/wakemymacd" "$APP/Contents/MacOS/wakemymacd"
+
+# App icon (Dock, Finder, About panel) and the menu bar template image.
+# Regenerate from Assets/WakeMyMacLogo.png with Assets/make-icons.swift.
+cp Assets/AppIcon.icns "$APP/Contents/Resources/"
+cp Assets/MenuBarIcon.png Assets/MenuBarIcon@2x.png "$APP/Contents/Resources/"
 
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -35,12 +40,14 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <key>CFBundleExecutable</key><string>WakeMyMac</string>
     <key>CFBundleIdentifier</key><string>${BUNDLE_ID}</string>
     <key>CFBundleName</key><string>WakeMyMac</string>
+    <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>${VERSION}</string>
     <key>CFBundleVersion</key><string>${VERSION}</string>
     <key>LSMinimumSystemVersion</key><string>13.0</string>
     <key>LSUIElement</key><true/>
     <key>NSPrincipalClass</key><string>NSApplication</string>
+    <key>NSHumanReadableCopyright</key><string>© 2026 Murat Çeliker</string>
 </dict>
 </plist>
 PLIST

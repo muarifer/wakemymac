@@ -61,18 +61,29 @@ struct RuleEditorView: View {
             Text(L10n.repeatTitle).font(.caption).foregroundStyle(.secondary)
             HStack(spacing: 4) {
                 // Show Monday-first regardless of Calendar's weekday numbering.
+                // Plain buttons with an explicit fill: bordered buttons don't
+                // render their tint in a non-key menu bar extra window, which
+                // makes the selection look dead.
                 ForEach([2, 3, 4, 5, 6, 7, 1], id: \.self) { day in
-                    let symbol = Calendar.current.veryShortWeekdaySymbols[day - 1]
+                    let symbol = Calendar.current.shortWeekdaySymbols[day - 1]
                     let isOn = rule.weekdays.contains(day)
-                    Button(symbol) {
+                    Button {
                         if isOn {
                             rule.weekdays.removeAll { $0 == day }
                         } else {
                             rule.weekdays = (rule.weekdays + [day]).sorted()
                         }
+                    } label: {
+                        Text(symbol)
+                            .font(.caption)
+                            .lineLimit(1)
+                            .frame(maxWidth: .infinity, minHeight: 22)
+                            .background(
+                                isOn ? Color.accentColor : Color.secondary.opacity(0.15),
+                                in: RoundedRectangle(cornerRadius: 5))
+                            .foregroundStyle(isOn ? .white : .primary)
                     }
-                    .buttonStyle(.bordered)
-                    .tint(isOn ? .accentColor : .secondary)
+                    .buttonStyle(.plain)
                 }
             }
             HStack(spacing: 8) {
