@@ -56,6 +56,12 @@ The UI is in English by default and switches to Turkish when the system language
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for design decisions and known limitations.
 
+## Caution
+
+WakeMyMac can shut down and restart your Mac unattended. macOS defers a shutdown when an app has unsaved work, but do not rely on that — treat a scheduled shutdown as a real one and save your work. The software comes with no warranty; see the license.
+
 ## License
 
-[MIT](LICENSE)
+[GNU General Public License v3.0 or later](LICENSE) — Copyright (C) 2026 Murat Çeliker.
+
+You may use, study, share and modify this software; derivative works must stay under the same license. The WakeMyMac name and app icon are not covered by this license.

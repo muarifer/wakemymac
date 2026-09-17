@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Murat Çeliker
+
 import Foundation
 
 /// Loads/saves the rule list as JSON at a fixed path. The daemon uses the

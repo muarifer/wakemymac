@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Murat Çeliker
+
 // Usage: swift makeicons.swift <logo.png> <out-dir>
 // Cleans the source glyph (drops faint noise and stray specks), then renders:
 //   AppIcon.iconset/    app icon, glyph on a squircle gradient background

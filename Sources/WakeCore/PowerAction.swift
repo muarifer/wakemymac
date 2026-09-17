@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Murat Çeliker
+
 import Foundation
 
 /// A schedulable power event. Raw values are exactly the IOPMLib event type

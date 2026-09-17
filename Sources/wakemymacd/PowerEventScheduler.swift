@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Murat Çeliker
+
 import Foundation
 import IOKit.pwr_mgt
 import WakeCore

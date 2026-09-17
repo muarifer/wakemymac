@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Murat Çeliker
+
 import Foundation
 
 /// A recurring schedule rule ("weekdays at 07:00, wake"). The daemon collapses
