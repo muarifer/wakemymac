@@ -109,7 +109,7 @@ final class SchedulerEngine {
 
         for rule in rules {
             guard let next = rule.nextOccurrence(after: floor) else {
-                log.warning("Rule \(rule.id) has no next occurrence, skipping")
+                log.warning("Rule \(rule.id, privacy: .public) has no next occurrence, skipping")
                 continue
             }
             do {
@@ -117,9 +117,9 @@ final class SchedulerEngine {
                 scheduled.append(ScheduledEventInfo(
                     date: next, action: rule.action,
                     ruleID: rule.id, ruleLabel: rule.effectiveLabel))
-                log.notice("Scheduled \(rule.action.rawValue) at \(next, privacy: .public) for rule \(rule.effectiveLabel, privacy: .public)")
+                log.notice("Scheduled \(rule.action.rawValue, privacy: .public) at \(next, privacy: .public) for rule \(rule.effectiveLabel, privacy: .public)")
             } catch {
-                log.error("Could not schedule \(rule.action.rawValue) at \(next): \(String(describing: error))")
+                log.error("Could not schedule \(rule.action.rawValue, privacy: .public) at \(next, privacy: .public): \(String(describing: error))")
             }
         }
 
