@@ -21,6 +21,20 @@ enum AppInfo {
                        accessibilityDescription: "WakeMyMac")!
     }
 
+    /// Uninstalling cancels every scheduled event and deletes the saved rules,
+    /// so it asks first.
+    @MainActor
+    static func confirmUninstall() -> Bool {
+        NSApp.activate(ignoringOtherApps: true)
+        let alert = NSAlert()
+        alert.alertStyle = .warning
+        alert.messageText = L10n.uninstallConfirmTitle
+        alert.informativeText = L10n.uninstallConfirmBody
+        alert.addButton(withTitle: L10n.uninstallConfirmAction)
+        alert.addButton(withTitle: L10n.cancel)
+        return alert.runModal() == .alertFirstButtonReturn
+    }
+
     @MainActor
     static func showAbout() {
         NSApp.activate(ignoringOtherApps: true)

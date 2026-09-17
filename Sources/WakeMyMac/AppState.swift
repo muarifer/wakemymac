@@ -86,12 +86,20 @@ final class AppState: ObservableObject {
         await refresh()
     }
 
+    /// Order matters: the daemon must unwind its power events while it is still
+    /// running. Unregistering first would stop the process and strand whatever
+    /// it had already registered with powerd.
     func uninstallDaemon() async {
+        if daemonReachable, let error = await client.prepareForRemoval() {
+            lastError = error
+        }
         do {
             try await daemonService.unregister()
         } catch {
             lastError = error.localizedDescription
         }
+        rules = []
+        scheduledEvents = []
         await refresh()
     }
 

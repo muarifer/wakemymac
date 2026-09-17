@@ -9,6 +9,10 @@ final class DaemonClient {
         if connection == nil {
             let c = NSXPCConnection(
                 machServiceName: DaemonConstants.machServiceName, options: .privileged)
+            // Only talk to a daemon signed by us. Planting one requires admin
+            // rights already, but this costs nothing and closes the other half
+            // of the trust relationship.
+            c.setCodeSigningRequirement(CodeSigningRequirement.forDaemon())
             c.remoteObjectInterface = NSXPCInterface(with: WakeDaemonProtocol.self)
             c.invalidationHandler = { [weak self] in self?.connection = nil }
             c.resume()
@@ -40,6 +44,18 @@ final class DaemonClient {
             proxy.getScheduledEvents { data in
                 finish(data.flatMap { try? JSONCodec.decode([ScheduledEventInfo].self, from: $0) })
             }
+        }
+    }
+
+    /// Asks the daemon to cancel its power events and delete stored rules.
+    /// Returns an error message, or nil on success.
+    func prepareForRemoval() async -> String? {
+        let result: String?? = await withTimeout { proxy, finish in
+            proxy.prepareForRemoval { finish($0) }
+        }
+        switch result {
+        case .none: return "Daemon is not reachable"
+        case .some(let inner): return inner
         }
     }
 

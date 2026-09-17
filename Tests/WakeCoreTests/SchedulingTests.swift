@@ -83,6 +83,67 @@ final class SchedulingTests: XCTestCase {
         XCTAssertEqual(decoded, rules)
     }
 
+    // MARK: - Validation
+    //
+    // Synthesized Codable decoding skips the designated initializer, so before
+    // Rule got an explicit init(from:) a hand-edited or hostile rules.json could
+    // carry weekday 0 or 8 and crash the menu bar app on symbol lookup.
+
+    func testDecodingSanitizesOutOfRangeValues() throws {
+        let json = """
+        [{"id":"\(UUID().uuidString)","label":"x","action":"shutdown",
+          "hour":99,"minute":-5,"weekdays":[0,3,8],"enabled":true}]
+        """
+        let rules = try JSONCodec.decode([Rule].self, from: Data(json.utf8))
+        XCTAssertEqual(rules[0].weekdays, [3])
+        XCTAssertEqual(rules[0].hour, 23)
+        XCTAssertEqual(rules[0].minute, 0)
+    }
+
+    func testDecodedWeekdaysAreAlwaysValidSymbolIndices() throws {
+        let json = """
+        [{"id":"\(UUID().uuidString)","action":"wake","hour":7,"minute":0,
+          "weekdays":[-3,0,1,7,8,99]}]
+        """
+        let rules = try JSONCodec.decode([Rule].self, from: Data(json.utf8))
+        let symbols = calendar.shortWeekdaySymbols
+        for day in rules[0].weekdays {
+            XCTAssertTrue(symbols.indices.contains(day - 1), "weekday \(day) out of range")
+        }
+    }
+
+    func testDuplicateWeekdaysCollapse() {
+        XCTAssertEqual(Rule(weekdays: [3, 3, 1, 3]).weekdays, [1, 3])
+    }
+
+    func testLabelIsBounded() {
+        let rule = Rule(label: String(repeating: "a", count: Limits.maxLabelLength + 500))
+        XCTAssertEqual(rule.label.count, Limits.maxLabelLength)
+    }
+
+    func testMissingOptionalFieldsGetDefaults() throws {
+        let json = """
+        [{"id":"\(UUID().uuidString)","action":"sleep","hour":1,"minute":2}]
+        """
+        let rules = try JSONCodec.decode([Rule].self, from: Data(json.utf8))
+        XCTAssertEqual(rules[0].label, "")
+        XCTAssertTrue(rules[0].enabled)
+        XCTAssertEqual(rules[0].weekdays, [])
+    }
+
+    func testRuleStoreDelete() throws {
+        let dir = FileManager.default.temporaryDirectory
+            .appendingPathComponent("wakemymac-tests-\(UUID().uuidString)")
+        let store = RuleStore(directory: dir.path)
+        defer { try? FileManager.default.removeItem(at: dir) }
+
+        try store.save([Rule(label: "Test")])
+        XCTAssertEqual(store.load().count, 1)
+        try store.delete()
+        XCTAssertEqual(store.load(), [])
+        XCTAssertNoThrow(try store.delete(), "deleting a missing file should be a no-op")
+    }
+
     func testRuleStoreRoundTrip() throws {
         let dir = FileManager.default.temporaryDirectory
             .appendingPathComponent("wakemymac-tests-\(UUID().uuidString)")

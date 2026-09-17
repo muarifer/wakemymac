@@ -15,6 +15,11 @@ public struct RuleStore: Sendable {
         return (try? JSONCodec.decode([Rule].self, from: data)) ?? []
     }
 
+    public func delete() throws {
+        guard FileManager.default.fileExists(atPath: fileURL.path) else { return }
+        try FileManager.default.removeItem(at: fileURL)
+    }
+
     public func save(_ rules: [Rule]) throws {
         let dir = fileURL.deletingLastPathComponent()
         try FileManager.default.createDirectory(

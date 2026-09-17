@@ -15,6 +15,10 @@ final class DaemonService: NSObject, WakeDaemonProtocol {
     }
 
     func setRules(_ rulesJSON: Data, reply: @escaping @Sendable (String?) -> Void) {
+        guard rulesJSON.count <= Limits.maxPayloadBytes else {
+            reply("Rules payload too large")
+            return
+        }
         let rules: [Rule]
         do {
             rules = try JSONCodec.decode([Rule].self, from: rulesJSON)
@@ -22,7 +26,15 @@ final class DaemonService: NSObject, WakeDaemonProtocol {
             reply("Malformed rules payload: \(error.localizedDescription)")
             return
         }
+        guard rules.count <= Limits.maxRules else {
+            reply("Too many rules (limit is \(Limits.maxRules))")
+            return
+        }
         reply(engine.updateRules(rules))
+    }
+
+    func prepareForRemoval(reply: @escaping @Sendable (String?) -> Void) {
+        reply(engine.prepareForRemoval())
     }
 
     func getRules(reply: @escaping @Sendable (Data?) -> Void) {
@@ -36,17 +48,22 @@ final class DaemonService: NSObject, WakeDaemonProtocol {
 
 final class XPCListenerDelegate: NSObject, NSXPCListenerDelegate {
     private let engine: SchedulerEngine
+    private let clientRequirement: String
     private let log = Logger(subsystem: DaemonConstants.machServiceName, category: "xpc")
 
     init(engine: SchedulerEngine) {
         self.engine = engine
+        // Computed once: reading our own signature per connection would be
+        // wasted work, and the answer cannot change while we run.
+        self.clientRequirement = CodeSigningRequirement.forApp()
     }
 
     func listener(_ listener: NSXPCListener,
                   shouldAcceptNewConnection newConnection: NSXPCConnection) -> Bool {
-        // TODO(hardening): before shipping outside our own machines, pin the
-        // client with setCodeSigningRequirement(_:) to our Developer ID /
-        // bundle ID so arbitrary local processes can't drive a root daemon.
+        // Must be set before resume(), and only once per connection. A client
+        // that fails the requirement has its connection invalidated by XPC
+        // rather than reaching DaemonService.
+        newConnection.setCodeSigningRequirement(clientRequirement)
         newConnection.exportedInterface = NSXPCInterface(with: WakeDaemonProtocol.self)
         newConnection.exportedObject = DaemonService(engine: engine)
         newConnection.resume()

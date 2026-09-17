@@ -146,7 +146,11 @@ struct MenuView: View {
                     set: { state.setLaunchAtLogin($0) }
                 ))
                 Button(L10n.refresh) { Task { await state.refresh() } }
-                Button(L10n.uninstallHelper) { Task { await state.uninstallDaemon() } }
+                Button(L10n.uninstallHelper) {
+                    if AppInfo.confirmUninstall() {
+                        Task { await state.uninstallDaemon() }
+                    }
+                }
                 Divider()
                 Button(L10n.quit) { NSApp.terminate(nil) }
             } label: {

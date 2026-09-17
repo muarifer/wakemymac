@@ -16,6 +16,9 @@ final class SchedulerEngine {
     /// After the earliest event's time passes, wait this long before
     /// rescheduling, so we compute "next" strictly after the fired occurrence.
     private let rearmDelay: TimeInterval = 30
+    /// When enabled rules exist but nothing could be registered, try again on
+    /// this interval instead of going silent until the next restart.
+    private let retryDelay: TimeInterval = 300
 
     private var timer: DispatchSourceTimer?
     private var scheduled: [ScheduledEventInfo] = []  // guarded by `queue`
@@ -51,13 +54,33 @@ final class SchedulerEngine {
         queue.sync { scheduled }
     }
 
+    /// Unwinds everything this daemon put into the system: launchd stopping the
+    /// process would otherwise leave our already-registered events in powerd,
+    /// so the Mac would still shut down at 23:00 with the app long gone.
+    func prepareForRemoval() -> String? {
+        queue.sync {
+            timer?.cancel()
+            timer = nil
+            PowerEventScheduler.cancelOwnedEvents(owner: owner)
+            scheduled = []
+            do {
+                try store.delete()
+            } catch {
+                log.error("Could not delete rules file: \(error.localizedDescription)")
+                return "Scheduled events were cancelled, but the rules file could not be removed: \(error.localizedDescription)"
+            }
+            log.info("Prepared for removal: events cancelled and rules deleted")
+            return nil
+        }
+    }
+
     // MARK: - Scheduling loop (always on `queue`)
 
     private func reschedule() {
         PowerEventScheduler.cancelOwnedEvents(owner: owner)
         scheduled = []
 
-        let rules = store.load().filter(\.enabled)
+        let rules = Array(store.load().filter(\.enabled).prefix(Limits.maxRules))
         let floor = Date().addingTimeInterval(minimumLeadTime)
 
         for rule in rules {
@@ -76,19 +99,30 @@ final class SchedulerEngine {
             }
         }
 
-        armRearmTimer()
+        armRearmTimer(hasPendingRules: !rules.isEmpty)
     }
 
     /// Fires shortly after the earliest scheduled event so that occurrence's
     /// rule gets its *next* one-shot registered. Uses a wall-clock deadline so
     /// the timer still fires promptly after the machine wakes from sleep.
-    private func armRearmTimer() {
+    private func armRearmTimer(hasPendingRules: Bool) {
         timer?.cancel()
         timer = nil
-        guard let earliest = scheduled.map(\.date).min() else { return }
+
+        let delay: TimeInterval
+        if let earliest = scheduled.map(\.date).min() {
+            delay = earliest.timeIntervalSinceNow + rearmDelay
+        } else if hasPendingRules {
+            // Enabled rules exist but none reached powerd. Without this the
+            // schedule would stay dead until the daemon restarted.
+            log.warning("No events registered despite enabled rules; retrying in \(self.retryDelay, privacy: .public)s")
+            delay = retryDelay
+        } else {
+            return
+        }
 
         let t = DispatchSource.makeTimerSource(queue: queue)
-        t.schedule(wallDeadline: .now() + earliest.timeIntervalSinceNow + rearmDelay)
+        t.schedule(wallDeadline: .now() + delay)
         t.setEventHandler { [weak self] in
             self?.log.info("Re-arm timer fired, rescheduling")
             self?.reschedule()

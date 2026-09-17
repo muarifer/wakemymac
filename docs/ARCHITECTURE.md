@@ -62,10 +62,17 @@ yeniden hesapla → sıradaki gerçekleşmeleri yaz   (döngü)
   XcodeGen ile türetilebilir.
 - **Ad-hoc imza geliştirme içindir.** `SMAppService` ad-hoc imzayla kendi
   makinede çalışır; dağıtım Developer ID + notarization ister.
-- **XPC istemci doğrulaması henüz yok** (`DaemonService.swift`'te TODO).
-  Root daemon'a kim bağlanabilir sorusunun cevabı şu an "herkes"; kendi
-  makinemiz için kabul edilebilir, dağıtımdan önce
-  `setCodeSigningRequirement` şart.
+- **XPC'nin iki ucu da imzaya sabitlenir** (`CodeSigningRequirement`).
+  Sistem alanındaki bir Mach servisine her yerel süreç erişebildiği için,
+  gereksinim olmadan makinedeki herhangi bir program kapatma zamanlayabilir
+  ya da kullanıcının kurallarını silebilirdi. Gereksinim dizesi *çağıran
+  binary'nin kendi imzasından* türetilir: Developer ID derlemesi karşı tarafı
+  aynı takıma sabitler, ad-hoc geliştirme derlemesinde sabitlenecek takım
+  olmadığından yalnız bundle identifier aranır — aksi halde `./build.sh`
+  çıktısı kendi daemon'ıyla konuşamazdı. Dize yalnızca derleme zamanı
+  sabitlerinden ve kendi imzamızdan kurulur, karşı taraftan gelen hiçbir
+  veriden değil: `setCodeSigningRequirement` bozuk bir gereksinimde
+  yakalanamayan exception atar.
 - **Zaman dilimi/DST:** occurrence hesabı `Calendar.current` ile yerel saatte
   yapılır ve mutlak `Date` yazılır. TZ/DST değişince mevcut kayıtlı olay eski
   duvarsaat karşılığında kalır; bir sonraki re-arm'da düzelir. (İyileştirme:
@@ -73,3 +80,20 @@ yeniden hesapla → sıradaki gerçekleşmeleri yaz   (döngü)
 - **Onarım döngüsü:** launchd `KeepAlive` ile daemon hep ayakta; çökerse
   yeniden başlar ve `start()` her açılışta tam yeniden zamanlama yapar —
   durumun tamamı rules.json'dan türetilebilir, diskte başka durum yok.
+  Hiçbir kural sisteme yazılamazsa (IOPM hatası) 5 dakikada bir yeniden
+  denenir; aksi halde zamanlama bir sonraki yeniden başlatmaya kadar sessizce
+  ölürdü.
+- **Kaldırma açıkça temizlenir.** launchd yalnız süreci durdurur, sürecin
+  powerd'ye yazdıklarını geri almaz. Bu yüzden uygulama `unregister()`
+  öncesi daemon'a `prepareForRemoval` der: olaylar iptal edilir, rules.json
+  silinir. SIGTERM üstünden otomatik temizlik **bilerek yapılmaz** — kapanma
+  sırasında da SIGTERM gelir ve o an "açılış" olayını iptal etmek tam olarak
+  makinenin bir daha açılmamasına yol açardı. Kullanıcı uygulamayı Kaldır
+  demeden silerse hasar sınırlıdır: olaylar tek seferliktir, kural başına en
+  fazla bir olay daha tetiklenir, sonra susar.
+- **Girdi sınırları.** `Rule`'un designated init'i hour/minute/weekday/etiket
+  invariantlarını zorlar ve `init(from:)` ona devreder — sentezlenmiş decode
+  doğrulamayı atladığı için elle düzenlenmiş bir rules.json weekday 0 veya 8
+  taşıyıp menü barını çökertebiliyordu. Daemon ayrıca payload boyutunu ve
+  kural sayısını sınırlar; her kural gerçek bir sistem güç olayına dönüştüğü
+  için sınırsız liste powerd'yi doldururdu.

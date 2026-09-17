@@ -17,3 +17,11 @@ public enum DaemonConstants {
 
     public static let version = "0.1.0"
 }
+
+/// Bounds enforced on anything crossing XPC or coming off disk. Each rule turns
+/// into a real system power event, so an unbounded list would flood powerd.
+public enum Limits {
+    public static let maxRules = 100
+    public static let maxLabelLength = 100
+    public static let maxPayloadBytes = 256 * 1024
+}

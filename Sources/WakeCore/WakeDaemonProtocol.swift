@@ -18,6 +18,12 @@ import Foundation
     /// Returns the power events currently registered with the system by this
     /// daemon, as JSON-encoded [ScheduledEventInfo].
     func getScheduledEvents(reply: @escaping @Sendable (Data?) -> Void)
+
+    /// Cancels every power event this daemon registered and deletes the stored
+    /// rules. The app calls this immediately before unregistering the daemon:
+    /// launchd only stops the process, it does not unwind what the process
+    /// registered with powerd.
+    func prepareForRemoval(reply: @escaping @Sendable (String?) -> Void)
 }
 
 /// Snapshot of one power event the daemon has registered with powerd.

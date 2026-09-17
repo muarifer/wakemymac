@@ -1,6 +1,12 @@
 import Foundation
 import WakeCore
 
+extension Array {
+    subscript(safe index: Int) -> Element? {
+        indices.contains(index) ? self[index] : nil
+    }
+}
+
 /// Küçük yerelleştirme yardımcısı: varsayılan İngilizce, sistem dili Türkçe ise Türkçe.
 /// (Elle oluşturulan .app paketinde .lproj kaynakları taşımamak için bilinçli olarak koddan.)
 enum L10n {
@@ -20,6 +26,14 @@ enum L10n {
     static var refresh: String { t("Refresh", "Yenile") }
     static var launchAtLogin: String { t("Launch at Login", "Girişte Başlat") }
     static var uninstallHelper: String { t("Uninstall Helper…", "Yardımcıyı Kaldır…") }
+    static var uninstallConfirmTitle: String {
+        t("Uninstall the WakeMyMac helper?", "WakeMyMac yardımcısı kaldırılsın mı?")
+    }
+    static var uninstallConfirmBody: String {
+        t("All scheduled power events will be cancelled and your saved rules will be deleted. Your Mac will no longer wake, sleep or shut down on schedule.",
+          "Zamanlanmış tüm güç olayları iptal edilecek ve kayıtlı kurallarınız silinecek. Mac'iniz artık programa göre uyanmayacak, uyumayacak veya kapanmayacak.")
+    }
+    static var uninstallConfirmAction: String { t("Uninstall", "Kaldır") }
     static var quit: String { t("Quit WakeMyMac", "WakeMyMac'ten Çık") }
     static var about: String { t("About WakeMyMac", "WakeMyMac Hakkında") }
     static var aboutCredits: String {
@@ -78,7 +92,9 @@ enum L10n {
         if days == Set(1...7) { return everyDay }
         if days == Set(2...6) { return weekdays }
         if days == Set([1, 7]) { return weekends }
+        // Rule's initializer keeps weekdays within 1...7, but this stays
+        // defensive: a bad symbol lookup would crash the whole menu bar app.
         let symbols = calendar.shortWeekdaySymbols
-        return rule.weekdays.map { symbols[$0 - 1] }.joined(separator: " ")
+        return rule.weekdays.compactMap { symbols[safe: $0 - 1] }.joined(separator: " ")
     }
 }

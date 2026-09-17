@@ -65,7 +65,9 @@ struct RuleEditorView: View {
                 // render their tint in a non-key menu bar extra window, which
                 // makes the selection look dead.
                 ForEach([2, 3, 4, 5, 6, 7, 1], id: \.self) { day in
-                    let symbol = Calendar.current.shortWeekdaySymbols[day - 1]
+                    // Fixed 1...7 literals, so the lookup is in range by
+                    // construction; nil-coalescing keeps it total anyway.
+                    let symbol = Calendar.current.shortWeekdaySymbols[safe: day - 1] ?? ""
                     let isOn = rule.weekdays.contains(day)
                     Button {
                         if isOn {
