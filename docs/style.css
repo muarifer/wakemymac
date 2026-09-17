@@ -50,7 +50,10 @@ body {
   font-size: 16px;
   line-height: 1.6;
 }
-.wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+/* Wide enough for the two-column hero; the text-only sections stay narrow
+   below so lines never run past a comfortable measure. */
+.wrap { max-width: 880px; margin: 0 auto; padding: 0 16px; }
+section:not(.hero) { max-width: 660px; }
 
 header { padding: 56px 0 8px; }
 .top { display: flex; align-items: center; gap: 14px; }
@@ -112,18 +115,51 @@ p > code {
 .copy:hover { color: var(--fg); border-color: var(--accent-border); }
 .copy.done { color: var(--accent); border-color: var(--accent-border); background: var(--accent-surface); }
 
-/* One column, uniform width: the captures have different intrinsic sizes, so
-   side-by-side scaling left them ragged. */
-.shots { display: flex; flex-direction: column; align-items: center; gap: 28px; }
-.shots figure { margin: 0; width: 100%; max-width: 440px; }
-.shots img {
-  display: block; width: 100%; height: auto;
-  border: 1px solid var(--line); border-radius: var(--radius); background: var(--card);
+/* Hero: screenshots on the left, the pitch on the right. */
+.hero {
+  display: grid; grid-template-columns: minmax(0, 380px) 1fr;
+  gap: 44px; align-items: center;
 }
-.shots figcaption {
+@media (max-width: 760px) {
+  .hero { grid-template-columns: 1fr; gap: 28px; }
+}
+
+/* The captures have different intrinsic sizes, so the stage is a fixed box and
+   each one is contained inside it — otherwise the layout jumps between slides. */
+.stage {
+  position: relative; height: 380px; overflow: hidden;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+}
+.slide {
+  position: absolute; inset: 0; margin: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 18px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+}
+/* Without JavaScript the first capture still shows. Once the slider takes
+   over, `ready` retires that fallback — otherwise slide one would stay lit
+   under every other slide. */
+.slide:first-child { opacity: 1; }
+[data-slider].ready .slide { opacity: 0; }
+[data-slider].ready .slide.is-active { opacity: 1; }
+.slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+.slider-caption {
   font: 400 13px/1.5 var(--sans); color: var(--fg-3);
-  margin-top: 10px; text-align: center;
+  margin: 12px 0 0; text-align: center; min-height: 2.6em;
 }
+.slider-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 2px; }
+.arrow {
+  font: 400 18px/1 var(--sans); color: var(--fg-2);
+  background: none; border: 1px solid var(--line); border-radius: 999px;
+  width: 28px; height: 28px; cursor: pointer; padding: 0;
+}
+.arrow:hover { color: var(--fg); border-color: var(--accent-border); }
+.dots { display: flex; gap: 6px; }
+.dots button {
+  width: 7px; height: 7px; padding: 0; border: 0; border-radius: 999px;
+  background: var(--line); cursor: pointer;
+}
+.dots button[aria-current="true"] { background: var(--accent); }
 
 ul { margin: 0; padding-left: 0; list-style: none; }
 li { color: var(--fg-2); padding: 9px 0; border-bottom: 1px solid var(--line); }

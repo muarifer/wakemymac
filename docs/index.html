@@ -32,30 +32,29 @@
     <p class="tagline">Wake, sleep or shut down your Mac on schedule — from the menu bar.</p>
   </header>
 
-  <section>
+  <section class="hero">
+    <div class="slider" data-slider>
+      <div class="stage">
+        <figure class="slide" data-caption="Your rules and a live countdown to the next event.">
+          <img src="screenshot.png" alt="The menu bar panel listing a rule, with a live countdown to the next scheduled event">
+        </figure>
+        <figure class="slide" data-caption="A repeating rule on any days of the week.">
+          <img src="screenshot-editor.png" alt="Rule editor set to Repeats, with checkboxes for each day of the week">
+        </figure>
+        <figure class="slide" data-caption="Or a one-time rule on a single date.">
+          <img src="screenshot-once.png" alt="Rule editor set to Once, with a calendar picker open on a single date">
+        </figure>
+      </div>
+      <p class="slider-caption">Your rules and a live countdown to the next event.</p>
+      <div class="slider-nav"></div>
+    </div>
+    <div class="hero-copy">
     <p class="lead">Your Mac should be awake when you sit down to work, and off when you don't need it. macOS used to let you schedule exactly that — then Apple removed the setting.</p>
     <p>WakeMyMac brings it back, and lifts the old one-rule limit. Wake for work every weekday morning, sleep at midnight, power on once for an early flight. It sits quietly in the menu bar and keeps to the schedule on its own — even when nobody is logged in.</p>
     <div class="actions">
       <a class="btn" href="https://github.com/muarifer/wakemymac/releases/latest">Download</a>
       <a class="btn ghost" href="https://github.com/muarifer/wakemymac">GitHub</a>
     </div>
-  </section>
-
-  <section>
-    <h2>Screenshots</h2>
-    <div class="shots">
-      <figure>
-        <img src="screenshot.png" alt="The menu bar panel listing a rule, with a live countdown to the next scheduled event">
-        <figcaption>Your rules and a live countdown to the next event.</figcaption>
-      </figure>
-      <figure>
-        <img src="screenshot-editor.png" alt="Rule editor set to Repeats, with checkboxes for each day of the week">
-        <figcaption>A repeating rule on any days of the week.</figcaption>
-      </figure>
-      <figure>
-        <img src="screenshot-once.png" alt="Rule editor set to Once, with a calendar picker open on a single date">
-        <figcaption>Or a one-time rule on a single date.</figcaption>
-      </figure>
     </div>
   </section>
 
@@ -88,5 +87,6 @@
 
 </div>
 <script src="copy.js"></script>
+<script src="slider.js"></script>
 </body>
 </html>
