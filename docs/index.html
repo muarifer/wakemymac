@@ -34,7 +34,8 @@
 
   <section>
     <span class="badge">macOS 13+ · Intel &amp; Apple Silicon</span>
-    <p class="lead">macOS used to have a schedule panel in Energy Saver. Apple removed it, and the replacement is a Terminal command whose repeat mode allows exactly one recurring event. WakeMyMac brings the panel back — with as many rules as you want.</p>
+    <p class="lead">Your Mac should be awake when you sit down to work, and off when you don't need it. macOS used to let you schedule exactly that — then Apple removed the setting.</p>
+    <p>WakeMyMac brings it back, and lifts the old one-rule limit. Wake for work every weekday morning, sleep at midnight, power on once for an early flight. It sits quietly in the menu bar and keeps to the schedule on its own — even when nobody is logged in.</p>
     <div class="actions">
       <a class="btn" href="https://github.com/muarifer/wakemymac/releases/latest">Download</a>
       <a class="btn ghost" href="https://github.com/muarifer/wakemymac">GitHub</a>
@@ -74,13 +75,6 @@
       <li>Keeps working when nobody is logged in — the schedule survives reboots</li>
       <li>Touches only the events it scheduled itself, so other tools keep working</li>
     </ul>
-  </section>
-
-  <section>
-    <h2>How it works</h2>
-    <p>The only real API for scheduled power events on macOS is <code>IOPMSchedulePowerEvent</code>, the same one <code>pmset</code> uses. It accepts any number of one-shot events but knows nothing about recurrence.</p>
-    <p>So recurrence lives in a small root daemon: it works out each rule's next occurrence, registers it as a one-shot event, and arms the following one after each event fires. You can see them yourself with:</p>
-    <pre>pmset -g sched</pre>
   </section>
 
   <section>

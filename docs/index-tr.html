@@ -34,7 +34,8 @@
 
   <section>
     <span class="badge">macOS 13+ · Intel ve Apple Silicon</span>
-    <p class="lead">macOS'ta Enerji Tasarrufu altında bir zamanlama paneli vardı. Apple onu kaldırdı; yerine önerdiği Terminal komutunun tekrar kipi ise yalnızca tek bir tekrarlı olaya izin veriyor. WakeMyMac o paneli geri getiriyor — istediğiniz kadar kuralla.</p>
+    <p class="lead">Mac'iniz siz masaya oturduğunuzda uyanık, ihtiyacınız olmadığında kapalı olmalı. macOS eskiden tam da bunu programlamanıza izin veriyordu — sonra Apple o ayarı kaldırdı.</p>
+    <p>WakeMyMac onu geri getiriyor, üstelik eski tek kural sınırını da kaldırıyor. Her hafta içi sabah iş için uyansın, gece yarısı uyusun, erken bir uçuş için bir kereliğine açılsın. Menü barında sessizce durur ve programa kendi başına uyar — kimse oturum açmamışken bile.</p>
     <div class="actions">
       <a class="btn" href="https://github.com/muarifer/wakemymac/releases/latest">İndir</a>
       <a class="btn ghost" href="https://github.com/muarifer/wakemymac">GitHub</a>
@@ -74,13 +75,6 @@
       <li>Kimse oturum açmamışken de çalışır — zamanlama yeniden başlatmalara dayanır</li>
       <li>Yalnızca kendi kurduğu olaylara dokunur, diğer araçlar çalışmaya devam eder</li>
     </ul>
-  </section>
-
-  <section>
-    <h2>Nasıl çalışır</h2>
-    <p>macOS'ta zamanlanmış güç olayları için tek gerçek API, <code>pmset</code>'in de kullandığı <code>IOPMSchedulePowerEvent</code>. İstediğiniz kadar tek seferlik olay kabul eder ama tekrardan haberi yoktur.</p>
-    <p>Tekrar bu yüzden küçük bir root daemon'da yaşıyor: her kuralın bir sonraki gerçekleşmesini hesaplar, tek seferlik olay olarak kaydeder ve olay geçtikçe sıradakini kurar. Kendiniz de görebilirsiniz:</p>
-    <pre>pmset -g sched</pre>
   </section>
 
   <section>
