@@ -4,6 +4,11 @@ A macOS menu bar app that wakes, powers on, sleeps, shuts down or restarts your 
 
 macOS's built-in `pmset repeat` allows only a single repeating event — WakeMyMac lifts that limit from the menu bar (⏰ icon).
 
+<p>
+  <img src="docs/screenshot.png" width="420" alt="WakeMyMac menu bar panel listing a daily wake rule, with a live countdown to the next scheduled event and the helper status">
+  <img src="docs/screenshot-editor.png" width="420" alt="Rule editor showing the action, time and day-of-week pickers with Daily, Weekdays and Weekends shortcuts">
+</p>
+
 ## Features
 
 - Unlimited recurring rules: action (wake / power on / sleep / shut down / restart) + time + days of the week, with daily/weekdays/weekends shortcuts
