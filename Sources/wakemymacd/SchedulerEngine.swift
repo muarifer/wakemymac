@@ -79,11 +79,32 @@ final class SchedulerEngine {
 
     // MARK: - Scheduling loop (always on `queue`)
 
+    /// Switches off one-time rules whose moment has gone by, so a spent rule
+    /// shows as finished instead of sitting enabled but permanently silent.
+    /// Returns the current rule list either way.
+    private func retireExpiredRules() -> [Rule] {
+        var rules = store.load()
+        var changed = false
+        for index in rules.indices where rules[index].enabled && rules[index].isExpired() {
+            rules[index].enabled = false
+            changed = true
+            log.info("Retired spent one-time rule \(rules[index].effectiveLabel, privacy: .public)")
+        }
+        if changed {
+            do {
+                try store.save(rules)
+            } catch {
+                log.error("Could not persist retired rules: \(error.localizedDescription)")
+            }
+        }
+        return rules
+    }
+
     private func reschedule() {
         PowerEventScheduler.cancelOwnedEvents(owner: owner)
         scheduled = []
 
-        let rules = Array(store.load().filter(\.enabled).prefix(Limits.maxRules))
+        let rules = Array(retireExpiredRules().filter(\.enabled).prefix(Limits.maxRules))
         let floor = Date().addingTimeInterval(minimumLeadTime)
 
         for rule in rules {

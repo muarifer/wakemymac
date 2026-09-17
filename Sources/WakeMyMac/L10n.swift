@@ -72,6 +72,10 @@ enum L10n {
     static var save: String { t("Save", "Kaydet") }
 
     static var everyDay: String { t("Every day", "Her gün") }
+    static var repeatsMode: String { t("Repeats", "Tekrarlı") }
+    static var onceMode: String { t("Once", "Tek seferlik") }
+    static var date: String { t("Date", "Tarih") }
+    static var expired: String { t("Expired", "Süresi geçti") }
 
     static func name(of action: PowerAction) -> String {
         switch action {
@@ -84,20 +88,34 @@ enum L10n {
         }
     }
 
+    /// Falls back to the bare action name, never "Wake at 08:00": the row's
+    /// second line already carries the schedule, so including the time here
+    /// prints it twice.
     static func title(of rule: Rule) -> String {
-        rule.label.isEmpty ? t("\(name(of: rule.action)) at \(rule.timeString)",
-                               "\(rule.timeString) \(name(of: rule.action))")
-                           : rule.label
+        rule.label.isEmpty ? name(of: rule.action) : rule.label
     }
 
-    static func weekdaysText(of rule: Rule, calendar: Calendar = .current) -> String {
-        let days = Set(rule.weekdays)
-        if days == Set(1...7) { return everyDay }
-        if days == Set(2...6) { return weekdays }
-        if days == Set([1, 7]) { return weekends }
-        // Rule's initializer keeps weekdays within 1...7, but this stays
-        // defensive: a bad symbol lookup would crash the whole menu bar app.
-        let symbols = calendar.shortWeekdaySymbols
-        return rule.weekdays.compactMap { symbols[safe: $0 - 1] }.joined(separator: " ")
+    /// The "when" line under a rule's title: a weekly pattern, or the date of a
+    /// one-time rule (marked once its moment has passed).
+    static func scheduleText(of rule: Rule, calendar: Calendar = .current) -> String {
+        switch rule.repeats {
+        case .once:
+            guard let when = rule.scheduledDate(calendar: calendar) else { return expired }
+            let formatter = DateFormatter()
+            formatter.dateStyle = .medium
+            formatter.timeStyle = .none
+            let day = formatter.string(from: when)
+            return rule.isExpired() ? "\(expired) · \(day)" : day
+
+        case .weekly(let weekdays):
+            let days = Set(weekdays)
+            if days == Set(1...7) { return everyDay }
+            if days == Set(2...6) { return self.weekdays }
+            if days == Set([1, 7]) { return weekends }
+            // Rule's initializer keeps weekdays within 1...7, but this stays
+            // defensive: a bad symbol lookup would crash the whole menu bar app.
+            let symbols = calendar.shortWeekdaySymbols
+            return weekdays.compactMap { symbols[safe: $0 - 1] }.joined(separator: " ")
+        }
     }
 }

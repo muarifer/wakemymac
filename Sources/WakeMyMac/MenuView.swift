@@ -114,7 +114,7 @@ struct MenuView: View {
             VStack(alignment: .leading, spacing: 1) {
                 Text(L10n.title(of: rule))
                     .strikethrough(!rule.enabled, color: .secondary)
-                Text("\(L10n.weekdaysText(of: rule)) · \(rule.timeString)")
+                Text("\(L10n.scheduleText(of: rule)) · \(rule.timeString)")
                     .font(.caption).foregroundStyle(.secondary)
             }
             Spacer()

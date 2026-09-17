@@ -38,6 +38,15 @@ final class DaemonService: NSObject, WakeDaemonProtocol {
 
     func prepareForRemoval(reply: @escaping @Sendable (String?) -> Void) {
         reply(engine.prepareForRemoval())
+        // Unregistering only removes the launchd job; observed behaviour is that
+        // the already-running process keeps going, leaving a root daemon alive
+        // after the user thought they removed it. Exit ourselves, after a beat
+        // so the reply above is actually delivered.
+        DispatchQueue.global().asyncAfter(deadline: .now() + 1) {
+            Logger(subsystem: DaemonConstants.machServiceName, category: "xpc")
+                .info("Exiting after removal request")
+            exit(0)
+        }
     }
 
     func getRules(reply: @escaping @Sendable (Data?) -> Void) {
