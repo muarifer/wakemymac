@@ -3,3 +3,12 @@
 WakeMyMac.app/
 *.zip
 .DS_Store
+
+# İmza/notarization sırları asla depoya girmesin (Keychain'de dururlar)
+*.p8
+*.p12
+*.pem
+*.key
+*.cer
+*.mobileprovision
+.env
